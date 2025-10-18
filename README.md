@@ -13,7 +13,7 @@ Hacknet-AI 是一个集中化的 HacknetExt 文档知识库项目，为开发者
 ## 错误举例
 
 1.<missionStart val="Branch_Activated">addIRCMessage</missionStart>
-在[Function.md](./Function.md)中没有这个函数，应吸取教训
+``在[Function.md](./Function.md)中没有这个函数，应吸取教训``
 
 
 ## 开始
