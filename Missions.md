@@ -1,272 +1,254 @@
+
+
 # Missions
-注意：本文未额外标注的标签将默认不可定义多个，且本文未额外标注的标签默认是必须定义的，并且所有的标签必须按照文档写的顺序依次定义，千万不能把顺序搞乱了
 
-在Hacknet中，每个邮件都是一个Mission，同时，Entopy和CSEC的任务数据库中的任务和DHS中的任务也是Mission  
-一个Mission的结构大概如下:  
+## 重要提示（AI必须遵守）
+> ⚠️ **AI处理规则**：
+> - 所有Mission标签必须严格按文档顺序定义，顺序错误会导致游戏崩溃
+> - 只能使用文档中明确定义的标签和属性，禁止推断或扩展
+> - 所有ID、文件名、路径必须使用英文、数字、下划线，禁止中文
+> - 文件路径必须使用正斜杠`/`，禁止反斜杠`\`
+
+## 核心术语表
+- **Mission（任务）**：游戏中的任务单元，通过邮件、任务数据库或文章触发
+- **Goal（目标）**：任务完成条件，一个任务可以有多个goal
+- **Flag（标志）**：布尔标记，用于跟踪游戏进度状态
+- **Action（行动）**：通过函数或条件触发的游戏逻辑
+
+## Mission基本结构
 ```xml
-<?xml version = "1.0" encoding = "UTF-8" ?>
-<mission id="testMission0" activeCheck="true" shouldIgnoreSenderVerification="false">
-    <goals>
-        <goal type="filedeletion" target="advExamplePC" file="asdf.txt" path="home"/>
-    </goals>
-    <!--missionStart和missionEnd对应着Function里的函数，可以在这两个标签里执行函数-->
-    <missionStart val="7" suppress="true">changeSong</missionStart>
-    <missionEnd val="1">addRank</missionEnd>
-    <nextMission IsSilent="false">NONE</nextMission>
-    <branchMissions>
-        <branch>Missions/BranchExample/TestBranchMission.xml</branch>
-    </branchMissions>
-    <posting title="Do the Extension Test Mission" reqs="someCustomFlag" requiredRank="3" >
-content
-    </posting>
-    <email>
-        <sender>Matt</sender>
-        <subject>Test Mission Email</subject>
-        <body>body</body>
-        <attachments>
-            <note title="An example note">note</note>
-            <link comp="missionTestNode" />
-        <account comp="missionTestNode" user="TestUser" pass="testpass" />
-        </attachments>
-    </email>
+<?xml version="1.0" encoding="UTF-8"?>
+<mission id="唯一任务ID" activeCheck="true" shouldIgnoreSenderVerification="false">
+    <!-- 标签必须按以下顺序定义 -->
+    <goals>...</goals>
+    <missionStart>...</missionStart>
+    <missionEnd>...</missionEnd>
+    <nextMission>...</nextMission>
+    <branchMissions>...</branchMissions>
+    <posting>...</posting>
+    <email>...</email>
 </mission>
-```  
-我们可以看到，Mission由`<mission>`开始，由`</mission>`结束  
-在开始标签中可以定义三个属性:  
-- id 任务id，必须属性
-- activeCheck 是否自动检查，也就是不需要玩家手动提交
-- shouldIgnoreSenderVerification 忽略发送者验证
+```
 
+## Mission标签属性
+### `<mission>` 根标签
+- `id` (**必须**)：任务唯一标识符，英文数字组成
+- `activeCheck` (可选)：是否自动检查目标完成，默认false
+- `shouldIgnoreSenderVerification` (可选)：忽略发送者验证，默认false
 
-一个mission大概有以下几个部分:  
-- goals 任务完成条件（可以定义多个）
-- missionStart 任务开始时执行的操作（函数）
-- missionEnd 任务结束时执行的操作（函数）
-- nextMission 下一个任务
-- branchMissions 分支任务
-- posting 用于任务数据库和DHS的额外标识（额外用处：用于文章）
-- email 给玩家发送的邮件(ps:在DHS中，不会给玩家发邮件)
+## Goals（任务目标）
+`<goals>` 标签**必须定义**，即使没有具体goal也要保留空标签。goal可以定义多个或不定义。
 
+### 正确用法示例
+```xml
+<!-- ✅ 正确：goals标签必须存在 -->
+<goals>
+    <goal type="filedeletion" target="pc1" file="test.txt" path="home"/>
+</goals>
 
-## Goals （goal可以不定义，但是不代表goals可以不定义）
-goals指的是任务完成条件，一个Mission可以有很多个goal，Matt提供的goal类型也有很多  
-goal（可以定义多个，可以不定义，如果不定义将是无条件）格式应为:`<goal type=[goal类型] [其余参数]/>`  
-goal共有以下几个类型:  
+<!-- ✅ 正确：空goals标签 -->
+<goals></goals>
 
-### filedeletion
+<!-- ❌ 错误：缺少goals标签 -->
+<mission id="test">
+    <email>...</email>  <!-- 顺序错误！ -->
+</mission>
+```
+
+### Goal类型详解
+
+#### filedeletion - 删除文件
 ```xml
 <goal type="filedeletion" target="advExamplePC" file="asdf.txt" path="home"/>
 ```
-类型:删除文件  
-参数:
-- target 目标节点ID
-- file 文件名
-- path 文件所在目录
+- `target`：目标节点ID
+- `file`：文件名
+- `path`：文件路径
 
-### clearfolder
+#### filechange - 修改文件内容
 ```xml
-<goal type="clearfolder" target="advExamplePC" path="home"/>
+<goal type="filechange" target="pc1" file="test.txt" path="home" keyword="hello"/>
 ```
-类型:清空文件夹  
-参数:
-- target 目标节点ID
-- path 要清空的目录路径
+- `removal` (可选)：true表示关键词不能出现，默认false
+- `caseSensitive` (可选)：是否区分大小写，默认false
 
-### filedownload
+**正确示例组合**：
 ```xml
-<goal type="filedownload" target="advExamplePC" file="downloadFile.txt" path="home"/>
+<!-- ✅ 正确：将data替换为extension -->
+<goal type="filechange" target="pc1" file="file.txt" path="home" keyword="extension"/>
+<goal type="filechange" target="pc1" file="file.txt" path="home" keyword="data" removal="true"/>
 ```
-类型:下载指定文件  
-参数:
-- target 目标节点ID
-- file 下载文件名
-- path 下载文件所在目录
 
-### filechange
-```xml
-<goal type="filechange" target="advExamplePC" file="changeFile.txt" path="home" keyword="extension"/>
-```
-类型:更改文件内容  
-参数:
-- target 目标节点ID
-- file 目标文件
-- path 目标文件所在目录
-- keyword 目标内容
-- removal 是否使keyword值在文件中不出现，可选参数，默认false
-- caseSensitive 区分大小写，可选参数，默认false
-
-#### 附加内容
-由于该类型可能较难理解，附加内容补充，我们将举一个例子  
-```xml
-<goal type="filechange" target="advExamplePC" file="changeFile.txt" path="home" keyword="extension"/>
-<goal type="filechange" target="advExamplePC" file="changeFile.txt" path="home" keyword="data" removal="true" caseSensitive="true"/>
-```
-这是一个组合goal,第一个goal指的是让关键字extension在changeFile.txt中出现  
-第二个goal指的是让关键字data在文件changeFile.txt中不出现，不区分大小写  
-这个组合goal可以实现:让文件中的data替换为extension  
-
-### getadmin
+#### getadmin - 获取管理员权限
 ```xml
 <goal type="getadmin" target="advExamplePC"/>
 ```
-类型:获取指定电脑的管理员权限  
-参数:
-- target 目标节点ID
+- `target`：目标节点ID
 
-### getstring
+#### getstring - 匹配附加内容
 ```xml
 <goal type="getstring" target="password" />
 ```
-类型:在附加内容中存在指定内容  
-参数:
-- target 需要与附加内容匹配的字符串
+- `target`：需要匹配的字符串
 
-### delay
+#### delay - 延迟时间
 ```xml
 <goal type="delay" time="10.0"/>
 ```
-类型:仅延迟一段时间  
-参数:
-- time 延迟时间，单位秒
+- `time`：延迟时间，单位秒
 
-### hasflag
+#### hasflag - 检查flag
 ```xml
 <goal type="hasflag" target="flagName"/>
 ```
-类型:获取指定flag  
-参数:
-- target 目标flag
+- `target`：目标flag名称
 
-### fileupload
+#### fileupload - 上传文件
 ```xml
 <goal type="fileupload" target="advExamplePC" file="asdf.txt" path="home" destTarget="introFactionHomeNode" destPath="Drop/Uploads"/>
-<goal type="fileupload" target="advExamplePC" file="asdf2.dec" path="home" destTarget="introFactionHomeNode" destPath="home" decrypt="true" decryptPass="password"/>
 ```
-类型:上传文件  
-参数:
-- target 目标节点ID
-- file 目标文件
-- path 目标文件所在目录
-- destTarget 目标文件需要上传到的节点
-- destPath 目标文件需要上传到的目录
-- decrypt 是否需要解密，适用于dec加密文件，可选参数，默认false
-- decryptPass 指定decrypt为true后需要，解密密码，可选参数
+- `target`：源节点ID
+- `file`：文件名
+- `path`：文件路径
+- `destTarget`：目标节点ID
+- `destPath`：目标路径
+- `decrypt` (可选)：是否解密，默认false
+- `decryptPass` (可选)：解密密码
 
-### AddDegree
+#### AddDegree - 添加学历记录
 ```xml
 <goal type="AddDegree" owner="John Stalvern" degree="Masters in Digital Security" uni="Manchester University" gpa="3.0"/>
 ```
-类型:在国际学术数据库中添加人员学历  
-参数:
-- owner 目标人名
-- degree 需要添加的学位名
-- uni 需要添加的学校名
-- gpa 绩点
+- `owner`：目标人名
+- `degree`：学位名称
+- `uni`：学校名称
+- `gpa`：绩点
 
-### wipedegrees
+#### wipedegrees - 删除学历记录
 ```xml
 <goal type="wipedegrees" owner="John Stalvern"/>
 ```
-类型:在国际学术数据库中删除人员数据  
-参数:
-- owner 目标人名
+- `owner`：目标人名
 
-### sendemail
+#### sendemail - 发送邮件
 ```xml
 <goal type="sendemail" mailServer="jmail" recipient="mailuser123" subject="Email Subject!"/>
 ```
-类型:发送邮件  
-参数:
-- mailServer 邮件服务器节点ID
-- recipient 接受者
-- subject 标题
+- `mailServer`：邮件服务器节点ID
+- `recipient`：收件人
+- `subject`：邮件主题
 
-### removeDeathRowRecord
+#### removeDeathRowRecord - 删除死亡记录
 ```xml
 <goal type="removeDeathRowRecord" fname="Matt" lname="Trobbiani"/>
 ```
-类型:删除人员死亡记录  
-参数:
-- fname 人员First Name(名)
-- lname 人员Last Name(姓)
+- `fname`：名
+- `lname`：姓
 
-#### 附加内容
-该goal可以是一个自闭合标签，也可以在开始和结束标签中添加遗言  
-
-### getadminpasswordstring(DLC专属)
+#### getadminpasswordstring - 获取管理员密码字符串(DLC)
 ```xml
 <goal type="getadminpasswordstring" target="advExamplePC"/>
 ```
-类型:在附加内容中填写了指定节点的管理员密码  
-参数:
-- target 目标节点ID
+- `target`：目标节点ID
 
+## missionStart & missionEnd
+### 正确用法
+```xml
+<!-- ✅ 正确：使用val属性传递数字参数 -->
+<missionStart val="7">changeSong</missionStart>
+<missionEnd val="1">addRank</missionEnd>
 
-## missionStart（可以不定义）
-在任务开始时执行的内容  
-可选属性:
-- val 给内置函数传的参数
-- suppress 是否在发送邮件时触发，否则在加载任务时触发
+<!-- ✅ 正确：使用字符串参数 -->
+<missionStart>setFaction:Entropy</missionStart>
 
-开始和结束标签中间是具体要执行的function(内置函数)
+<!-- ❌ 错误：参数格式错误 -->
+<missionStart>addRank:1</missionStart>  <!-- 应该用val属性 -->
+```
 
-## missionEnd（可以不定义）
-在任务结束时执行的内容  
-可选属性只有一个,val 给内置函数传的参数
+## nextMission & branchMissions
+### nextMission
+```xml
+<nextMission IsSilent="false">Missions/NextMission.xml</nextMission>
+<!-- 如果没有后续任务 -->
+<nextMission>NONE</nextMission>
+```
 
-开始和结束标签中间是具体要执行的function(内置函数)
-
-## nextMission（如果这个mission是文章，那也要定义，可以写NONE）
-下一个任务，也就是完成本任务后自动跳转的任务  
-可选属性只有一个,IsSilent 让这个任务不发邮件安静处理，注意是当前任务不是下一个任务
-
-开始和结束标签中间是下一个Mission的相对路径，可以为NONE
-
-## branchMissions
-分支任务  
-解释:如果完成了分支任务中任何一个任务的所有goal，则自动跳转到该分支任务的nextMission  
-branchMissions中可以有多个mission  
-实例格式:  
+### branchMissions
 ```xml
 <branchMissions>
-    <branch>Missions/BranchExample/TestBranchMission.xml</branch>
+    <branch>Missions/Branch1.xml</branch>
+    <branch>Missions/Branch2.xml</branch>
 </branchMissions>
 ```
 
-## posting
-用于在任务数据库和DHS中添加额外内容（文章的标题和内容）
-属性:
-- title 显示的标题
-- reqs 解锁该任务需要的flag
-- requiredRank 解锁该任务需要的积分
+## posting（任务数据库显示）
+```xml
+<posting title="任务标题" reqs="所需flag" requiredRank="所需积分">
+任务描述内容
+</posting>
+```
 
-开始标签和结束标签中间为显示的该任务大致描述
+## email（邮件内容）
+```xml
+<email>
+    <sender>发送者</sender>
+    <subject>邮件主题</subject>
+    <body>邮件正文</body>
+    <attachments>
+        <note title="笔记标题">笔记内容</note>
+        <link comp="目标节点ID"/>
+        <account comp="目标节点ID" user="用户名" pass="密码"/>
+    </attachments>
+</email>
+```
 
-## email（如果mission是一个文章，那么email也必须定义，但是只不过就是去了用处罢了）
-给玩家发送的邮件，若为DHS任务（或这是一个文章）则不发送邮件  
-可用标签:
-- sender 发送者
-- subject 标题
-- body 内容，同时也可以是DHS任务中的任务详情
+## 完整正确示例
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<mission id="exampleMission" activeCheck="true">
+    <goals>
+        <goal type="filedeletion" target="targetPC" file="data.txt" path="home"/>
+        <goal type="getadmin" target="targetPC"/>
+    </goals>
+    
+    <missionStart val="5">changeSong</missionStart>
+    <missionEnd>setFaction:TestFaction</missionEnd>
+    
+    <nextMission IsSilent="false">Missions/Next.xml</nextMission>
+    
+    <branchMissions>
+        <branch>Missions/Branch1.xml</branch>
+    </branchMissions>
+    
+    <posting title="示例任务" reqs="startFlag" requiredRank="3">
+这是一个示例任务描述
+    </posting>
+    
+    <email>
+        <sender>Admin</sender>
+        <subject>重要任务</subject>
+        <body>请完成这个任务</body>
+        <attachments>
+            <note title="说明">任务说明笔记</note>
+            <link comp="targetPC"/>
+        </attachments>
+    </email>
+</mission>
+```
 
-### attachments
-邮件附件  
-可用标签:  
+## Mission文件验证清单
+在创建Mission文件时，请检查以下事项：
+- [ ] `id`属性已定义且唯一
+- [ ] 所有标签按正确顺序排列：goals → missionStart → missionEnd → nextMission → branchMissions → posting → email
+- [ ] goals标签存在（即使为空）
+- [ ] 所有文件路径使用正斜杠`/`
+- [ ] 没有使用中文或特殊字符在ID、文件名中
+- [ ] nextMission路径正确或为NONE
+- [ ] 函数参数格式正确（数字用val属性，字符串用标签内容）
 
-#### note（可以定义多个，可不定义）
-笔记，属性:
-- title 在邮件中显示的标题
+## 常见错误避免
+1. **标签顺序错误**：email标签不能出现在goals之前
+2. **路径格式错误**：使用`Missions/Folder/file.xml`而不是`Missions\Folder\file.xml`
+3. **中文使用错误**：所有ID、文件名必须英文
+4. **参数格式错误**：数字参数用val属性，字符串参数用标签内容
 
-开始标签和结束标签中间为笔记内容
-
-#### link（可以定义多个，可不定义）
-节点链接，属性:
-- comp 目标节点ID
-
-这是一个自闭合标签
-
-#### account（可以定义多个，可不定义）
-账号，属性:
-- comp 目标节点ID
-- user 用户名
-- pass 密码
