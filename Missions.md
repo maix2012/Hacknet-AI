@@ -1,5 +1,5 @@
 # Missions
-注意：本文未额外标注的标签将默认不可定义多个
+注意：本文未额外标注的标签将默认不可定义多个，且本文未额外标注的标签默认是必须定义的
 
 在Hacknet中，每个邮件都是一个Mission，同时，Entopy和CSEC的任务数据库中的任务和DHS中的任务也是Mission  
 一个Mission的结构大概如下:  
@@ -44,13 +44,13 @@ content
 - missionEnd 任务结束时执行的操作（函数）
 - nextMission 下一个任务
 - branchMissions 分支任务
-- posting 用于任务数据库和DHS的额外标识
+- posting 用于任务数据库和DHS的额外标识（额外用处：用于文章）
 - email 给玩家发送的邮件(ps:在DHS中，不会给玩家发邮件)
 
 
-## Goals （可以定义多个）
+## Goals （goal可以不定义，但是不代表goals可以不定义）
 goals指的是任务完成条件，一个Mission可以有很多个goal，Matt提供的goal类型也有很多  
-goal格式应为:`<goal type=[goal类型] [其余参数]/>`  
+goal（可以定义多个，可以不定义，如果不定义将是无条件）格式应为:`<goal type=[goal类型] [其余参数]/>`  
 goal共有以下几个类型:  
 
 ### filedeletion
@@ -234,7 +234,7 @@ branchMissions中可以有多个mission
 ```
 
 ## posting
-用于在任务数据库和DHS中添加额外内容  
+用于在任务数据库和DHS中添加额外内容（文章的标题和内容）
 属性:
 - title 显示的标题
 - reqs 解锁该任务需要的flag
@@ -242,8 +242,8 @@ branchMissions中可以有多个mission
 
 开始标签和结束标签中间为显示的该任务大致描述
 
-## email
-给玩家发送的邮件，若为DHS任务则不发送邮件  
+## email（如果mission是一个文章，那么email也必须定义，但是只不过就是去了用处罢了）
+给玩家发送的邮件，若为DHS任务（或这是一个文章）则不发送邮件  
 可用标签:
 - sender 发送者
 - subject 标题
@@ -253,19 +253,19 @@ branchMissions中可以有多个mission
 邮件附件  
 可用标签:  
 
-#### note（可以定义多个）
+#### note（可以定义多个，可不定义）
 笔记，属性:
 - title 在邮件中显示的标题
 
 开始标签和结束标签中间为笔记内容
 
-#### link（可以定义多个）
+#### link（可以定义多个，可不定义）
 节点链接，属性:
 - comp 目标节点ID
 
 这是一个自闭合标签
 
-#### account（可以定义多个）
+#### account（可以定义多个，可不定义）
 账号，属性:
 - comp 目标节点ID
 - user 用户名
