@@ -7,6 +7,7 @@
     <goals>
         <goal type="filedeletion" target="advExamplePC" file="asdf.txt" path="home"/>
     </goals>
+    <!--missionStart和missionEnd对应着Function里的函数，可以在这两个标签里执行函数-->
     <missionStart val="7" suppress="true">changeSong</missionStart>
     <missionEnd val="1">addRank</missionEnd>
     <nextMission IsSilent="false">NONE</nextMission>
@@ -37,8 +38,8 @@ content
 
 一个mission大概有以下几个部分:  
 - goals 任务完成条件
-- missionStart 任务开始时执行的操作
-- missionEnd 任务结束时执行的操作
+- missionStart 任务开始时执行的操作（函数）
+- missionEnd 任务结束时执行的操作（函数）
 - nextMission 下一个任务
 - branchMissions 分支任务
 - posting 用于任务数据库和DHS的额外标识
