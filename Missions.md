@@ -202,7 +202,7 @@ goal共有以下几个类型:
 - target 目标节点ID
 
 
-## missionStart
+## missionStart（可以不定义）
 在任务开始时执行的内容  
 可选属性:
 - val 给内置函数传的参数
@@ -210,13 +210,13 @@ goal共有以下几个类型:
 
 开始和结束标签中间是具体要执行的function(内置函数)
 
-## missionEnd
+## missionEnd（可以不定义）
 在任务结束时执行的内容  
 可选属性只有一个,val 给内置函数传的参数
 
 开始和结束标签中间是具体要执行的function(内置函数)
 
-## nextMission
+## nextMission（如果这个mission是文章，那也要定义，可以写NONE）
 下一个任务，也就是完成本任务后自动跳转的任务  
 可选属性只有一个,IsSilent 让这个任务不发邮件安静处理，注意是当前任务不是下一个任务
 
