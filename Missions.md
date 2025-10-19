@@ -1,4 +1,6 @@
 # Missions
+注意：本文未额外标注的标签将默认不可定义多个
+
 在Hacknet中，每个邮件都是一个Mission，同时，Entopy和CSEC的任务数据库中的任务和DHS中的任务也是Mission  
 一个Mission的结构大概如下:  
 ```xml
@@ -37,7 +39,7 @@ content
 
 
 一个mission大概有以下几个部分:  
-- goals 任务完成条件
+- goals 任务完成条件（可以定义多个）
 - missionStart 任务开始时执行的操作（函数）
 - missionEnd 任务结束时执行的操作（函数）
 - nextMission 下一个任务
@@ -46,7 +48,7 @@ content
 - email 给玩家发送的邮件(ps:在DHS中，不会给玩家发邮件)
 
 
-## Goals
+## Goals （可以定义多个）
 goals指的是任务完成条件，一个Mission可以有很多个goal，Matt提供的goal类型也有很多  
 goal格式应为:`<goal type=[goal类型] [其余参数]/>`  
 goal共有以下几个类型:  
@@ -251,19 +253,19 @@ branchMissions中可以有多个mission
 邮件附件  
 可用标签:  
 
-#### note
+#### note（可以定义多个）
 笔记，属性:
 - title 在邮件中显示的标题
 
 开始标签和结束标签中间为笔记内容
 
-#### link
+#### link（可以定义多个）
 节点链接，属性:
 - comp 目标节点ID
 
 这是一个自闭合标签
 
-#### account
+#### account（可以定义多个）
 账号，属性:
 - comp 目标节点ID
 - user 用户名
