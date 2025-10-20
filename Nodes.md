@@ -365,7 +365,7 @@ Different users too
 类似Entech的网站服务器  
 `name` : 在网页界面现实的网站名  
 `url` : 显示的网页在扩展的相对路径  
-
+概念错误：添加web服务器不代表一定要添加或开发80端口，端口与web服务器没有任何的关联
 ### deathRowDatabase
 ```xml
 <deathRowDatabase />
